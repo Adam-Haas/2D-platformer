@@ -1,0 +1,5 @@
+cmake-*/
+bin/
+.idea/
+*.exe
+*.dll
