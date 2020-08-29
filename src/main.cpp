@@ -21,23 +21,43 @@ int main(int argc, char *args[]) {
 
     RenderWindow window("GAME v1.0", windowWidth, windowHeight);
     SDL_Texture *grassTexture = window.loadTexture("res/gfx/ground_grass_1.png");
+    SDL_Texture *minerTextureRight = window.loadTexture("res/gfx/miner_right_32.png");
+    SDL_Texture *minerTextureLeft = window.loadTexture("res/gfx/miner_left_32.png");
 
-    std::vector<Entity> entities = {Entity(0, 0, grassTexture),
-                                    Entity(30, 0, grassTexture),
-                                    Entity(30, 30, grassTexture),
-                                    Entity(30, 60, grassTexture)};
+    Entity mainCharacter = Entity(50, windowHeight-(32 * 8), minerTextureRight, true);
     bool gameRunning = true;
     SDL_Event gameEvent;
     while (gameRunning) {
         while (SDL_PollEvent(&gameEvent)) {
-            if (gameEvent.type == SDL_QUIT)
-                gameRunning = false;
+            switch (gameEvent.type) {
+                case SDL_QUIT:
+                    gameRunning = false;
+                    break;
+                case SDL_KEYDOWN:
+                    switch (gameEvent.key.keysym.sym) {
+                        case SDLK_LEFT:
+                            mainCharacter = Entity(mainCharacter.getX()-8, mainCharacter.getY(), minerTextureLeft, true);
+                            break;
+                        case SDLK_RIGHT:
+                            mainCharacter = Entity(mainCharacter.getX()+8, mainCharacter.getY(), minerTextureRight, true);
+                            break;
+                        case SDLK_SPACE:
+                            mainCharacter = Entity(mainCharacter.getX(), mainCharacter.getY() - 64, minerTextureRight, true);
+                            break;
+                    }
+            }
         }
 
         window.clear();
-        for (Entity& entity : entities) {
+
+        //Draw the floor
+        for (int i = 0; i < windowWidth; i+=(32*4)) {
+            Entity entity = Entity(i, windowHeight-(32 * 4), grassTexture, true);
             window.render(entity);
         }
+
+        //Draw the character
+        window.render(mainCharacter);
 
         window.display();
     }
