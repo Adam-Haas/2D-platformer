@@ -18,14 +18,14 @@ float Entity::getY() {
     return yPosition;
 }
 
-bool Entity::isSolid() {
-    return solid;
-}
-
 SDL_Texture* Entity::getTexture() {
     return texture;
 }
 
 SDL_Rect Entity::getCurrentFrame() {
     return currentFrame;
+}
+
+bool Entity::isSolid() {
+    return solid;
 }

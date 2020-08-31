@@ -4,6 +4,9 @@
 #include <vector>
 #include <RenderWindow.h>
 #include <Entity.h>
+#include <GameObject.h>
+#include <chrono>
+#include <thread>
 
 const int windowWidth = 1280;
 const int windowHeight = 720;
@@ -24,7 +27,9 @@ int main(int argc, char *args[]) {
     SDL_Texture *minerTextureRight = window.loadTexture("res/gfx/miner_right_32.png");
     SDL_Texture *minerTextureLeft = window.loadTexture("res/gfx/miner_left_32.png");
 
-    Entity mainCharacter = Entity(50, windowHeight-(32 * 8), minerTextureRight, true);
+    GameObject mainCharacter = GameObject(50, windowHeight - (32 * 8), minerTextureLeft ,minerTextureRight, 10);
+    const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
+
     bool gameRunning = true;
     SDL_Event gameEvent;
     while (gameRunning) {
@@ -35,24 +40,26 @@ int main(int argc, char *args[]) {
                     break;
                 case SDL_KEYDOWN:
                     switch (gameEvent.key.keysym.sym) {
-                        case SDLK_LEFT:
-                            mainCharacter = Entity(mainCharacter.getX()-8, mainCharacter.getY(), minerTextureLeft, true);
-                            break;
-                        case SDLK_RIGHT:
-                            mainCharacter = Entity(mainCharacter.getX()+8, mainCharacter.getY(), minerTextureRight, true);
-                            break;
-                        case SDLK_SPACE:
-                            mainCharacter = Entity(mainCharacter.getX(), mainCharacter.getY() - 64, minerTextureRight, true);
+                        case SDLK_ESCAPE:
+                            gameRunning = false;
                             break;
                     }
             }
         }
 
+        if (keyboardState[SDL_SCANCODE_LEFT]) {
+            mainCharacter.step(StepAction::MoveLeft);
+        }
+
+        if (keyboardState[SDL_SCANCODE_RIGHT]) {
+            mainCharacter.step(StepAction::MoveRight);
+        }
+
         window.clear();
 
         //Draw the floor
-        for (int i = 0; i < windowWidth; i+=(32*4)) {
-            Entity entity = Entity(i, windowHeight-(32 * 4), grassTexture, true);
+        for (int i = 0; i < windowWidth; i += (32 * 4)) {
+            Entity entity = Entity(i, windowHeight - (32 * 4), grassTexture, true);
             window.render(entity);
         }
 
@@ -60,6 +67,7 @@ int main(int argc, char *args[]) {
         window.render(mainCharacter);
 
         window.display();
+        SDL_Delay(50);
     }
 
     window.cleanUp();
